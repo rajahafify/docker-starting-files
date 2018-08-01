@@ -1,0 +1,36 @@
+version: "2"
+services:
+  app:
+    build: .
+    command: ./bin/docker/start
+    volumes:
+      - change-me-sync:/app:nocopy
+    volumes_from:
+      - cache
+    environment:
+      - WITHIN_DOCKER=1
+      - PGHOST=postgres
+      - PGUSER=postgres
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - mailcatcher
+  postgres:
+    image: postgres:10-alpine
+    volumes:
+      - .:/app
+    ports:
+      - "5432:5432"
+  mailcatcher:
+    image: yappabe/mailcatcher
+    ports:
+      - "1025:1025"
+      - "1080:1080"
+  cache:
+    image: busybox
+    volumes:
+      - /cache
+volumes:
+  change-me-sync:
+    external: true
